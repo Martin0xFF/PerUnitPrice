@@ -1,0 +1,45 @@
+# Android
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+local.properties
+.gradle/
+build/
+app/build/
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+cmake-build-*/
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.settings
+.classpath
+
+# Rust
+target/
+**/*.rs.bk
+
+# Gradle
+.gradle/
+build/
+/build/
+/*/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# JNI Libs (built by Rust)
+app/src/main/jniLibs/

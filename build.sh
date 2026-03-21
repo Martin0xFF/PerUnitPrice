@@ -9,5 +9,15 @@ if [ "$TOTAL_MEM" -lt "$REQUIRED_MEM" ]; then
     exit 1
 fi
 
+# Create local output directory
+mkdir -p out
+
+# Build
 podman build -t per-unit-price-builder .
 podman run --rm -v $(pwd):/app:Z per-unit-price-builder bash -c "gradle assembleDebug --no-daemon"
+
+# Copy resulting APK to the local output folder
+if [ -d "app/build/outputs/apk/debug" ]; then
+    cp -r app/build/outputs/apk/debug/* out/
+    echo "Build artifacts copied to local 'out' directory."
+fi

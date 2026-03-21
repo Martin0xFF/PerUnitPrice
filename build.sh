@@ -16,8 +16,8 @@ mkdir -p out
 podman build -t per-unit-price-builder .
 podman run --rm -v $(pwd):/app:Z per-unit-price-builder bash -c "gradle assembleDebug --no-daemon"
 
-# Copy resulting APK to the local output folder
+# Move resulting APK to the local output folder
 if [ -d "app/build/outputs/apk/debug" ]; then
-    cp -r app/build/outputs/apk/debug/* out/
-    echo "Build artifacts copied to local 'out' directory."
+    mv app/build/outputs/apk/debug/* out/
+    echo "Build artifacts moved to local 'out' directory."
 fi

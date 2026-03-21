@@ -1,10 +1,16 @@
-FROM debian:bookworm-slim
+FROM ubuntu:22.04
 
 # Avoid tzdata interactive prompt
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
+# Enable amd64 for multi-arch support on arm64 hosts
+RUN dpkg --add-architecture amd64 && \
+    sed -i 's/http:\/\/ports.ubuntu.com\/ubuntu-ports/http:\/\/archive.ubuntu.com\/ubuntu/g' /etc/apt/sources.list && \
+    echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main universe restricted multiverse" > /etc/apt/sources.list.d/arm64.list && \
+    echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main universe restricted multiverse" >> /etc/apt/sources.list.d/arm64.list && \
+    echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main universe restricted multiverse" >> /etc/apt/sources.list.d/arm64.list && \
+    sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list && \
+    apt-get update && apt-get install -y \
     curl \
     unzip \
     git \
@@ -14,6 +20,9 @@ RUN apt-get update && apt-get install -y \
     python3 \
     pkg-config \
     libssl-dev \
+    libc6:amd64 \
+    libstdc++6:amd64 \
+    libz1:amd64 \
     && rm -rf /var/lib/apt/lists/*
 
 # Setup Android SDK
@@ -28,7 +37,6 @@ RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
     rm cmdline-tools.zip
 
 # Accept licenses and install Android components
-# We use ndk 26.1.10909125 which is modern and stable
 RUN yes | sdkmanager --licenses && \
     sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125"
 

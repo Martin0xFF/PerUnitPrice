@@ -54,10 +54,11 @@ RUN rustup target add \
     x86_64-linux-android && \
     cargo install cargo-ndk
 
-# Install Gradle
+# Install Gradle and pre-seed the environment
 RUN wget -q https://services.gradle.org/distributions/gradle-8.1.1-bin.zip -O gradle.zip && \
     unzip -q gradle.zip -d /opt/gradle && \
-    rm gradle.zip
+    rm gradle.zip && \
+    /opt/gradle/gradle-8.1.1/bin/gradle -v
 ENV PATH=${PATH}:/opt/gradle/gradle-8.1.1/bin
 
 # Set working directory

@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.example.perunitprice'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.example.perunitprice"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
     }
@@ -19,6 +19,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
         }
     }
     compileOptions {
@@ -46,6 +51,7 @@ dependencies {
 tasks.register("buildRustJni", Exec) {
     def cargoNdkCommand = "cargo ndk -t arm64-v8a -t armeabi-v7a -t x86 -t x86_64 -o ../app/src/main/jniLibs build --release"
     workingDir "../core_logic"
+    environment "RUSTFLAGS", "-Clink-arg=-Wl,-z,max-page-size=16384"
     commandLine 'bash', '-c', cargoNdkCommand
 }
 

@@ -1,4 +1,5 @@
 use regex::Regex;
+use log::{debug, warn};
 
 #[derive(Debug, PartialEq)]
 pub enum Unit {
@@ -15,9 +16,11 @@ pub struct ParsedInput {
 
 pub fn parse_input(input: &str) -> Option<ParsedInput> {
     let input = input.trim().to_lowercase();
+    debug!("Parsing input: '{}'", input);
     
     // If empty or just spaces, it's 1 item
     if input.is_empty() {
+        debug!("Input is empty, defaulting to 1 item");
         return Some(ParsedInput { quantity: 1.0, unit: Unit::Item });
     }
 
@@ -36,14 +39,19 @@ pub fn parse_input(input: &str) -> Option<ParsedInput> {
         "l" | "liter" | "litre" | "liters" | "litres" => (quantity, Unit::Litres),
         "ml" | "milliliter" | "millilitre" | "milliliters" | "millilitres" => (quantity / 1000.0, Unit::Litres),
         "" | "item" | "items" | "unit" | "units" => (quantity, Unit::Item),
-        _ => return None, // Unknown unit
+        _ => {
+            warn!("Unknown unit: '{}'", unit_str);
+            return None;
+        }
     };
 
+    debug!("Parsed quantity: {}, unit: {:?}", normalized_quantity, unit);
     Some(ParsedInput { quantity: normalized_quantity, unit })
 }
 
 pub fn calculate_per_unit_price(price: f64, quantity: f64) -> f64 {
     if quantity <= 0.0 {
+        warn!("Quantity is <= 0: {}", quantity);
         return 0.0;
     }
     price / quantity

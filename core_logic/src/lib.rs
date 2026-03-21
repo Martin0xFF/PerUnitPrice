@@ -16,7 +16,7 @@ pub extern "system" fn JNI_OnLoad(_vm: *mut std::ffi::c_void, _reserved: *mut st
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_example_perunitprice_MainActivity_calculatePerUnitPrice(
+pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculatePerUnitPrice(
     mut env: JNIEnv,
     _class: JClass,
     price: f64,

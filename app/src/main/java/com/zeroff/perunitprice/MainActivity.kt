@@ -1,4 +1,4 @@
-package com.example.perunitprice
+package com.zeroff.perunitprice
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

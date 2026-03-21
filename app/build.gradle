@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.perunitprice'
+    namespace 'com.zeroff.perunitprice'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.example.perunitprice"
+        applicationId "com.zeroff.perunitprice"
         minSdk 24
         targetSdk 35
         versionCode 1

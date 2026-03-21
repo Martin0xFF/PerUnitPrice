@@ -33,20 +33,17 @@
         android:hint="e.g. 500g" />
 
     <Button
-        android:id="@+id/btnCalculate"
+        android:id="@+id/btnAddItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Calculate Per-Unit Price"
+        android:text="Add Item"
         android:layout_marginTop="16dp" />
 
-    <TextView
-        android:id="@+id/textResult"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Result will appear here"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginTop="32dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>

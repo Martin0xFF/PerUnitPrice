@@ -50,3 +50,25 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculatePerUni
     let output = env.new_string(result).expect("Couldn't create java string!");
     output.into_raw()
 }
+
+#[no_mangle]
+pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculateRawPerUnitPrice(
+    mut env: JNIEnv,
+    _class: JClass,
+    price: f64,
+    quantity_str: JString,
+) -> jni::sys::jdouble {
+    let input: String = env
+        .get_string(&quantity_str)
+        .expect("Couldn't get java string!")
+        .into();
+
+    match parser::parse_input(&input) {
+        Some(parsed) => {
+            parser::calculate_per_unit_price(price, parsed.quantity)
+        }
+        None => {
+            f64::MAX // Return a high value to sort invalid ones to the bottom
+        }
+    }
+}

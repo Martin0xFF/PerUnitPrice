@@ -3,6 +3,7 @@ package com.zeroff.perunitprice
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,12 +30,20 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Activity created")
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        val btnReset = findViewById<Button>(R.id.btnReset)
 
         productAdapter = ProductAdapter { name, priceStr, quantityStr ->
             addItem(name, priceStr, quantityStr)
         }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = productAdapter
+
+        btnReset.setOnClickListener {
+            Log.d(TAG, "Reset All clicked")
+            productList.clear()
+            productAdapter.submitList(emptyList())
+            Toast.makeText(this, "All items cleared", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun addItem(name: String, priceStr: String, quantityStr: String) {

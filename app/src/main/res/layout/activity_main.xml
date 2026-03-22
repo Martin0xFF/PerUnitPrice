@@ -6,6 +6,16 @@
     android:padding="8dp"
     android:fitsSystemWindows="true">
 
+    <Button
+        android:id="@+id/btnReset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset All"
+        android:layout_gravity="end"
+        android:textSize="12sp"
+        style="?android:attr/borderlessButtonStyle"
+        android:textColor="#FF0000" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

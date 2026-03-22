@@ -1,15 +1,10 @@
-FROM ubuntu:22.04
+FROM debian:bookworm-slim
 
 # Avoid tzdata interactive prompt
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Enable amd64 for multi-arch support on arm64 hosts
 RUN dpkg --add-architecture amd64 && \
-    sed -i 's/http:\/\/ports.ubuntu.com\/ubuntu-ports/http:\/\/archive.ubuntu.com\/ubuntu/g' /etc/apt/sources.list && \
-    echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main universe restricted multiverse" > /etc/apt/sources.list.d/arm64.list && \
-    echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main universe restricted multiverse" >> /etc/apt/sources.list.d/arm64.list && \
-    echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main universe restricted multiverse" >> /etc/apt/sources.list.d/arm64.list && \
-    sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list && \
     apt-get update && apt-get install -y \
     curl \
     unzip \

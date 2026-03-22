@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "[PUP][UI]"
-    private val productList = mutableListOf<Product>()
     private lateinit var productAdapter: ProductAdapter
     private var firstUnit: String? = null
 
@@ -24,6 +23,12 @@ class MainActivity : AppCompatActivity() {
     private external fun calculatePerUnitPrice(price: Double, quantityStr: String): String
     private external fun calculateRawPerUnitPrice(price: Double, quantityStr: String): Double
     private external fun getUnit(quantityStr: String): String
+    
+    // New storage management functions
+    private external fun addProduct(name: String, priceStr: String, quantityStr: String)
+    private external fun clearProducts()
+    private external fun getProductCount(): Int
+    private external fun getProductAt(index: Int): String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +47,8 @@ class MainActivity : AppCompatActivity() {
 
         btnReset.setOnClickListener {
             Log.d(TAG, "Reset All clicked")
-            productList.clear()
-            productAdapter.submitList(emptyList())
+            clearProducts()
+            refreshList()
             firstUnit = null
             Toast.makeText(this, "All items cleared", Toast.LENGTH_SHORT).show()
         }
@@ -66,23 +71,39 @@ class MainActivity : AppCompatActivity() {
             quantityStr
         }
 
-        // Call the native Rust functions
-        val formattedResult = calculatePerUnitPrice(price, effectiveQuantityStr)
-        val rawPrice = calculateRawPerUnitPrice(price, effectiveQuantityStr)
-        
-        Log.d(TAG, "Native calculation result: $formattedResult (Raw: $rawPrice)")
-        
-        val newProduct = Product(name, priceStr, effectiveQuantityStr, formattedResult, rawPrice)
-        productList.add(newProduct)
+        // Call the native Rust function to add and sort
+        addProduct(name, priceStr, effectiveQuantityStr)
         
         if (firstUnit == null && currentUnit.isNotEmpty()) {
             firstUnit = currentUnit
             Log.d(TAG, "First unit set: $firstUnit")
         }
         
-        // Sort list by raw price ascending
-        productList.sortBy { it.rawPerUnitPrice }
-        
-        productAdapter.submitList(productList.toList())
+        refreshList()
+    }
+
+    private fun refreshList() {
+        val count = getProductCount()
+        val products = mutableListOf<Product>()
+        for (i in 0 until count) {
+            val productStr = getProductAt(i)
+            if (productStr.isNotEmpty()) {
+                val p = parseProduct(productStr)
+                if (p != null) products.add(p)
+            }
+        }
+        productAdapter.submitList(products)
+    }
+
+    private fun parseProduct(s: String): Product? {
+        val parts = s.split(";")
+        if (parts.size < 5) return null
+        return Product(
+            name = parts[0],
+            priceInput = parts[1],
+            quantityInput = parts[2],
+            formattedResult = parts[3],
+            rawPerUnitPrice = parts[4].toDoubleOrNull() ?: 0.0
+        )
     }
 }

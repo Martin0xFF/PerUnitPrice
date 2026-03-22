@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="Qty"
-        android:inputType="text"
+        android:inputType="numberDecimal"
         android:imeOptions="actionDone"/>
 
     <Button

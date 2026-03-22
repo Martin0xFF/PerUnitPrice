@@ -16,6 +16,60 @@ pub extern "system" fn JNI_OnLoad(_vm: *mut std::ffi::c_void, _reserved: *mut st
 }
 
 #[no_mangle]
+pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_addProduct(
+    mut env: JNIEnv,
+    _class: JClass,
+    name: JString,
+    price_input: JString,
+    quantity_input: JString,
+) {
+    let name: String = env.get_string(&name).unwrap().into();
+    let price_input: String = env.get_string(&price_input).unwrap().into();
+    let quantity_input: String = env.get_string(&quantity_input).unwrap().into();
+
+    parser::add_product(name, price_input, quantity_input);
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_clearProducts(
+    _env: JNIEnv,
+    _class: JClass,
+) {
+    parser::clear_products();
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getProductCount(
+    _env: JNIEnv,
+    _class: JClass,
+) -> jint {
+    parser::get_product_count() as jint
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getProductAt(
+    mut env: JNIEnv,
+    _class: JClass,
+    index: jint,
+) -> jstring {
+    if let Some(product) = parser::get_product_at(index as usize) {
+        // Return a semicolon-separated string for simplicity
+        let result = format!("{};{};{};{};{}", 
+            product.name, 
+            product.price_input, 
+            product.quantity_input, 
+            product.formatted_result, 
+            product.raw_per_unit_price
+        );
+        let output = env.new_string(result).expect("Couldn't create java string!");
+        output.into_raw()
+    } else {
+        let output = env.new_string("").expect("Couldn't create java string!");
+        output.into_raw()
+    }
+}
+
+#[no_mangle]
 pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculatePerUnitPrice(
     mut env: JNIEnv,
     _class: JClass,
@@ -32,11 +86,7 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculatePerUni
     let result = match parser::parse_input(&input) {
         Some(parsed) => {
             let per_unit = parser::calculate_per_unit_price(price, parsed.quantity);
-            let unit_name = match parsed.unit {
-                parser::Unit::Grams => "g",
-                parser::Unit::Litres => "L",
-                parser::Unit::Item => "item",
-            };
+            let unit_name = if parsed.unit.is_empty() { "unit" } else { &parsed.unit };
             let formatted = format!("{:.2} / {}", per_unit, unit_name);
             info!("Successfully parsed input. Per unit price: {}", formatted);
             formatted

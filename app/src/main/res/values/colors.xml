@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background / Surface (very light cream) -->
+    <color name="md_theme_light_surface">#FBF8F2</color>
+    <color name="md_theme_light_onSurface">#261A13</color>
+    
+    <!-- Primary (Tan/Brown) -->
+    <color name="md_theme_light_primary">#9E663D</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#F2E7D5</color>
+    <color name="md_theme_light_onPrimaryContainer">#261A13</color>
+    
+    <!-- Secondary (Medium Brown) -->
+    <color name="md_theme_light_secondary">#704D36</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#F2E7D5</color>
+    <color name="md_theme_light_onSecondaryContainer">#261A13</color>
+
+    <!-- Teriary / Accents (Dark Espresso) -->
+    <color name="md_theme_light_tertiary">#3E2723</color>
+    <color name="md_theme_light_onTertiary">#FFFFFF</color>
+
+    <!-- Error -->
+    <color name="md_theme_light_error">#BA1A1A</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+    
+    <!-- Outline -->
+    <color name="md_theme_light_outline">#85736B</color>
+    <color name="md_theme_light_surfaceVariant">#F2E7D5</color>
+    <color name="md_theme_light_onSurfaceVariant">#53433B</color>
+
+</resources>

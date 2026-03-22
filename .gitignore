@@ -42,5 +42,5 @@ Thumbs.db
 desktop.ini
 
 # JNI Libs (built by Rust)
-app/src/main/jniLibs/
+src/app/src/main/jniLibs/
 build.log

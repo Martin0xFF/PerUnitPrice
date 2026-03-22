@@ -88,7 +88,7 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculatePerUni
             let per_unit = product::calculate_per_unit_price(price, parsed.quantity);
             let unit_name = if parsed.unit.is_empty() { "unit" } else { &parsed.unit };
             let formatted = format!("{:.2} / {}", per_unit, unit_name);
-            info!("Successfully parsed input. Per unit price: {}", formatted);
+            info!("Successfully parsed input. PerUnitPrice: {}", formatted);
             formatted
         }
         None => {

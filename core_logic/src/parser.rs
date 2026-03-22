@@ -59,7 +59,7 @@ pub fn add_product(name: String, price_input: String, quantity_input: String) {
         raw_per_unit_price,
     };
 
-    let mut store = STORE.lock().unwrap();
+    let mut store = STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned");
     store.heap.push(Reverse(product));
     
     // Update cache
@@ -72,18 +72,18 @@ pub fn add_product(name: String, price_input: String, quantity_input: String) {
 }
 
 pub fn clear_products() {
-    let mut store = STORE.lock().unwrap();
+    let mut store = STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned");
     store.heap.clear();
     store.cached_sorted.clear();
     info!("Product store cleared");
 }
 
 pub fn get_product_count() -> usize {
-    STORE.lock().unwrap().cached_sorted.len()
+    STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned").cached_sorted.len()
 }
 
 pub fn get_product_at(index: usize) -> Option<Product> {
-    STORE.lock().unwrap().cached_sorted.get(index).cloned()
+    STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned").cached_sorted.get(index).cloned()
 }
 
 #[derive(Debug, PartialEq)]

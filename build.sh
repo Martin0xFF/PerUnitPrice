@@ -21,9 +21,7 @@ run_with_spinner() {
 
     while kill -0 $pid 2>/dev/null; do
         i=$(( (i+1) % 3 ))
-        # Get the last non-empty line of the log for context
-        local last_line=$(tail -n 5 "$LOG_FILE" 2>/dev/null | grep -v '^$' | tail -n 1 | cut -c1-60 | tr -d '\r\n')
-        printf "\r%s %s %-60s" "$msg" "${spin[$i]}" "$last_line"
+        printf "\r%s %s" "$msg" "${spin[$i]}"
         sleep 0.2
     done
 

@@ -109,12 +109,12 @@ execute_gradle() {
         $CONTAINER_ENGINE exec "$CONTAINER_NAME" gradle "$GRADLE_TASK"
 }
 
-move_artifacts() {
-    echo -n "Moving artifacts... "
+copy_artifacts() {
+    echo -n "Copying artifacts... "
     mkdir -p out
     if [ -d "src/app/build/outputs/apk/debug" ]; then
         if ls src/app/build/outputs/apk/debug/* >> "$LOG_FILE" 2>&1; then
-            mv src/app/build/outputs/apk/debug/* out/ >> "$LOG_FILE" 2>&1
+            cp src/app/build/outputs/apk/debug/* out/ >> "$LOG_FILE" 2>&1
             echo "OK (Artifacts in 'out/')"
         else
             echo "Done (No new artifacts)"
@@ -134,5 +134,5 @@ build_image
 ensure_container_running
 format_code
 execute_gradle
-move_artifacts
+copy_artifacts
 

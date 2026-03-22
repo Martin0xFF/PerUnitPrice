@@ -4,12 +4,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface">
+    android:background="@drawable/pup_background">
+
+    <!-- Semi-transparent overlay to ensure content readability -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorSurfaceAlpha" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="?attr/colorSurfaceAlpha"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -18,7 +24,7 @@
             android:layout_height="?attr/actionBarSize"
             app:title="@string/app_name"
             app:titleCentered="true"
-            app:titleTextColor="?attr/colorOnSurface"
+            app:titleTextColor="?attr/colorSecondary"
             app:navigationIcon="@drawable/ic_moon"
             app:navigationIconTint="?attr/colorSecondary">
 

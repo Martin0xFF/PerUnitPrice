@@ -28,5 +28,7 @@
     <color name="md_theme_dark_outline">#9F8D84</color>
     <color name="md_theme_dark_surfaceVariant">#53433B</color>
     <color name="md_theme_dark_onSurfaceVariant">#D7C2B9</color>
+    
+    <color name="md_theme_dark_surface_alpha">#E61C1B17</color>
 
 </resources>

@@ -28,5 +28,7 @@
     <color name="md_theme_light_outline">#85736B</color>
     <color name="md_theme_light_surfaceVariant">#F2E7D5</color>
     <color name="md_theme_light_onSurfaceVariant">#53433B</color>
+    
+    <color name="md_theme_light_surface_alpha">#E6FBF8F2</color>
 
 </resources>

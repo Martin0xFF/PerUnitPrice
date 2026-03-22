@@ -1,9 +1,9 @@
-use regex::Regex;
-use log::{debug, warn, info};
-use std::collections::BinaryHeap;
-use std::cmp::Reverse;
-use std::sync::Mutex;
+use log::{debug, info, warn};
 use once_cell::sync::Lazy;
+use regex::Regex;
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
+use std::sync::Mutex;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Product {
@@ -18,7 +18,8 @@ impl Eq for Product {}
 
 impl PartialOrd for Product {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.raw_per_unit_price.partial_cmp(&other.raw_per_unit_price)
+        self.raw_per_unit_price
+            .partial_cmp(&other.raw_per_unit_price)
     }
 }
 
@@ -45,10 +46,14 @@ pub fn add_product(name: String, price_input: String, quantity_input: String) {
     let (formatted_result, raw_per_unit_price) = match parse_input(&quantity_input) {
         Some(parsed) => {
             let per_unit = calculate_per_unit_price(price, parsed.quantity);
-            let unit_name = if parsed.unit.is_empty() { "unit" } else { &parsed.unit };
+            let unit_name = if parsed.unit.is_empty() {
+                "unit"
+            } else {
+                &parsed.unit
+            };
             (format!("${:.2} / {}", per_unit, unit_name), per_unit)
         }
-        None => ("Invalid input".to_string(), f64::MAX)
+        None => ("Invalid input".to_string(), f64::MAX),
     };
 
     let product = Product {
@@ -59,31 +64,47 @@ pub fn add_product(name: String, price_input: String, quantity_input: String) {
         raw_per_unit_price,
     };
 
-    let mut store = STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned");
+    let mut store = STORE
+        .lock()
+        .expect("Failed to lock ProductStore Mutex; it may be poisoned");
     store.heap.push(Reverse(product));
-    
+
     // Update cache
     let mut temp_heap = store.heap.clone();
     store.cached_sorted.clear();
     while let Some(Reverse(p)) = temp_heap.pop() {
         store.cached_sorted.push(p);
     }
-    info!("Product added. Total products: {}", store.cached_sorted.len());
+    info!(
+        "Product added. Total products: {}",
+        store.cached_sorted.len()
+    );
 }
 
 pub fn clear_products() {
-    let mut store = STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned");
+    let mut store = STORE
+        .lock()
+        .expect("Failed to lock ProductStore Mutex; it may be poisoned");
     store.heap.clear();
     store.cached_sorted.clear();
     info!("Product store cleared");
 }
 
 pub fn get_product_count() -> usize {
-    STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned").cached_sorted.len()
+    STORE
+        .lock()
+        .expect("Failed to lock ProductStore Mutex; it may be poisoned")
+        .cached_sorted
+        .len()
 }
 
 pub fn get_product_at(index: usize) -> Option<Product> {
-    STORE.lock().expect("Failed to lock ProductStore Mutex; it may be poisoned").cached_sorted.get(index).cloned()
+    STORE
+        .lock()
+        .expect("Failed to lock ProductStore Mutex; it may be poisoned")
+        .cached_sorted
+        .get(index)
+        .cloned()
 }
 
 #[derive(Debug, PartialEq)]
@@ -95,10 +116,13 @@ pub struct ParsedInput {
 pub fn parse_input(input: &str) -> Option<ParsedInput> {
     let input = input.trim().to_lowercase();
     debug!("Parsing input: '{}'", input);
-    
+
     if input.is_empty() {
         debug!("Input is empty, defaulting to 1 unit");
-        return Some(ParsedInput { quantity: 1.0, unit: "".to_string() });
+        return Some(ParsedInput {
+            quantity: 1.0,
+            unit: "".to_string(),
+        });
     }
 
     // Match number followed by optional unit string
@@ -114,7 +138,9 @@ pub fn parse_input(input: &str) -> Option<ParsedInput> {
 }
 
 pub fn get_unit_str(input: &str) -> String {
-    parse_input(input).map(|p| p.unit).unwrap_or_else(|| "".to_string())
+    parse_input(input)
+        .map(|p| p.unit)
+        .unwrap_or_else(|| "".to_string())
 }
 
 pub fn calculate_per_unit_price(price: f64, quantity: f64) -> f64 {
@@ -133,7 +159,10 @@ mod tests {
     fn test_parse_kg() {
         assert_eq!(
             parse_input("1.5 kg"),
-            Some(ParsedInput { quantity: 1.5, unit: "kg".to_string() })
+            Some(ParsedInput {
+                quantity: 1.5,
+                unit: "kg".to_string()
+            })
         );
     }
 
@@ -141,7 +170,10 @@ mod tests {
     fn test_parse_ml() {
         assert_eq!(
             parse_input("500ml"),
-            Some(ParsedInput { quantity: 500.0, unit: "ml".to_string() })
+            Some(ParsedInput {
+                quantity: 500.0,
+                unit: "ml".to_string()
+            })
         );
     }
 
@@ -149,7 +181,10 @@ mod tests {
     fn test_parse_empty_unit() {
         assert_eq!(
             parse_input("5"),
-            Some(ParsedInput { quantity: 5.0, unit: "".to_string() })
+            Some(ParsedInput {
+                quantity: 5.0,
+                unit: "".to_string()
+            })
         );
     }
 
@@ -169,7 +204,11 @@ mod tests {
     #[test]
     fn test_product_store_sorting() {
         clear_products();
-        add_product("Expensive".to_string(), "100.0".to_string(), "1".to_string());
+        add_product(
+            "Expensive".to_string(),
+            "100.0".to_string(),
+            "1".to_string(),
+        );
         add_product("Cheap".to_string(), "10.0".to_string(), "1".to_string());
         add_product("Medium".to_string(), "50.0".to_string(), "1".to_string());
 

@@ -32,6 +32,13 @@ fi
 # Determine gradle task (defaults to assembleDebug)
 GRADLE_TASK=${1:-"assembleDebug"}
 
+# Run formatters
+echo "Formatting Rust code..."
+podman exec "$CONTAINER_NAME" bash -c "cd core_logic && cargo fmt" || { echo "Error: Rust formatting failed"; exit 1; }
+
+echo "Formatting Kotlin code..."
+podman exec "$CONTAINER_NAME" bash -c "ktlint -F 'app/src/main/java/**/*.kt'" || { echo "Error: Kotlin formatting failed"; exit 1; }
+
 echo "Executing: gradle $GRADLE_TASK inside $CONTAINER_NAME..."
 podman exec "$CONTAINER_NAME" gradle "$GRADLE_TASK"
 

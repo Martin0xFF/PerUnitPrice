@@ -39,7 +39,8 @@ RUN yes | sdkmanager --licenses && \
 ENV RUSTUP_HOME=/opt/rustup \
     CARGO_HOME=/opt/cargo \
     PATH=/opt/cargo/bin:$PATH
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    rustup component add rustfmt
 
 # Add Android targets for cross-compilation and install cargo-ndk
 RUN rustup target add \
@@ -48,6 +49,11 @@ RUN rustup target add \
     i686-linux-android \
     x86_64-linux-android && \
     cargo install cargo-ndk
+
+# Install ktlint for Kotlin formatting
+RUN curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.0.1/ktlint && \
+    chmod a+x ktlint && \
+    mv ktlint /usr/local/bin/
 
 # Install Gradle and pre-seed the environment
 RUN wget -q https://services.gradle.org/distributions/gradle-8.1.1-bin.zip -O gradle.zip && \

@@ -9,9 +9,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ProductAdapter(
-    private val onAddProduct: (String, String, String) -> Unit
+    private val onAddProduct: (String, String, String) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
     companion object {
         private const val TYPE_INPUT = 0
         private const val TYPE_PRODUCT = 1
@@ -29,7 +28,10 @@ class ProductAdapter(
         return if (position == 0) TYPE_INPUT else TYPE_PRODUCT
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == TYPE_INPUT) {
             val view = inflater.inflate(R.layout.item_input, parent, false)
@@ -40,7 +42,10 @@ class ProductAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         if (holder is ProductViewHolder) {
             holder.bind(products[position - 1], position - 1)
         }
@@ -50,7 +55,7 @@ class ProductAdapter(
 
     class InputViewHolder(
         itemView: View,
-        private val onAddProduct: (String, String, String) -> Unit
+        private val onAddProduct: (String, String, String) -> Unit,
     ) : RecyclerView.ViewHolder(itemView) {
         private val editName: EditText = itemView.findViewById(R.id.editName)
         private val editPrice: EditText = itemView.findViewById(R.id.editPrice)
@@ -92,7 +97,10 @@ class ProductAdapter(
         private val textInputs: TextView = itemView.findViewById(R.id.textInputs)
         private val textResult: TextView = itemView.findViewById(R.id.textResult)
 
-        fun bind(product: Product, position: Int) {
+        fun bind(
+            product: Product,
+            position: Int,
+        ) {
             val rank = position + 1
             textRank.text = "#$rank"
             textName.text = product.name

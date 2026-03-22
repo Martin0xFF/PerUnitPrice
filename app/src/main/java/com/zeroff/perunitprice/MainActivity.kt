@@ -59,7 +59,8 @@ class MainActivity : AppCompatActivity() {
         toolbar.setNavigationIcon(if (isDarkMode) R.drawable.ic_sun else R.drawable.ic_moon)
 
         toolbar.setNavigationOnClickListener {
-            val newMode = !prefs.getBoolean(KEY_DARK_MODE, false)
+            val currentMode = prefs.getBoolean(KEY_DARK_MODE, false)
+            val newMode = !currentMode
             prefs.edit().putBoolean(KEY_DARK_MODE, newMode).apply()
             
             if (newMode) {
@@ -69,12 +70,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        productAdapter = ProductAdapter { name, priceStr, quantityStr ->
-            addItem(name, priceStr, quantityStr)
-        }
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = productAdapter
-
         btnReset.setOnClickListener {
             Log.d(TAG, "Reset All clicked")
             clearProducts()
@@ -82,6 +77,15 @@ class MainActivity : AppCompatActivity() {
             firstUnit = null
             Toast.makeText(this, "All items cleared", Toast.LENGTH_SHORT).show()
         }
+
+        productAdapter = ProductAdapter { name, priceStr, quantityStr ->
+            addItem(name, priceStr, quantityStr)
+        }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = productAdapter
+
+        // Refresh list to show existing products (e.g. after theme switch)
+        refreshList()
     }
 
     private fun addItem(name: String, priceStr: String, quantityStr: String) {

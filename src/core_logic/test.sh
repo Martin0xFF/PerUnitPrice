@@ -8,8 +8,8 @@ CONTAINER_NAME="per-unit-price-dev"
 if ! podman ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
     echo "Starting build container via build.sh..."
     # We run a no-op task (or just help) to trigger container startup without a full build
-    ./build.sh help >/dev/null 2>&1
+    ../../build.sh help >/dev/null 2>&1
 fi
 
 echo "Running Rust core logic tests inside $CONTAINER_NAME..."
-podman exec "$CONTAINER_NAME" bash -c "cd core_logic && cargo test"
+podman exec "$CONTAINER_NAME" bash -c "cd src/core_logic && cargo test"

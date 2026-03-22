@@ -25,7 +25,7 @@ fi
 
 # Ensure image is built
 echo -n "Building container image... "
-if podman build -t per-unit-price-builder . >> "$LOG_FILE" 2>&1; then
+if podman build -t per-unit-price-builder -f infra/Dockerfile . >> "$LOG_FILE" 2>&1; then
     echo "OK"
 else
     echo "FAILED (Check $LOG_FILE)"
@@ -50,7 +50,7 @@ GRADLE_TASK=${1:-"assembleDebug"}
 
 # Run formatters
 echo -n "Formatting Rust code... "
-if podman exec "$CONTAINER_NAME" bash -c "cd core_logic && cargo fmt" >> "$LOG_FILE" 2>&1; then
+if podman exec "$CONTAINER_NAME" bash -c "cd src/core_logic && cargo fmt" >> "$LOG_FILE" 2>&1; then
     echo "OK"
 else
     echo "FAILED (Check $LOG_FILE)"
@@ -58,7 +58,7 @@ else
 fi
 
 echo -n "Formatting Kotlin code... "
-if podman exec "$CONTAINER_NAME" bash -c "ktlint -F 'app/src/main/java/**/*.kt'" >> "$LOG_FILE" 2>&1; then
+if podman exec "$CONTAINER_NAME" bash -c "ktlint -F 'src/app/src/main/java/**/*.kt'" >> "$LOG_FILE" 2>&1; then
     echo "OK"
 else
     echo "FAILED (Check $LOG_FILE)"
@@ -76,10 +76,10 @@ fi
 # Create local output directory and move artifacts if they exist
 echo -n "Moving artifacts... "
 mkdir -p out
-if [ -d "app/build/outputs/apk/debug" ]; then
+if [ -d "src/app/build/outputs/apk/debug" ]; then
     # Check if there are any files to move
-    if ls app/build/outputs/apk/debug/* >> "$LOG_FILE" 2>&1; then
-        mv app/build/outputs/apk/debug/* out/ >> "$LOG_FILE" 2>&1
+    if ls src/app/build/outputs/apk/debug/* >> "$LOG_FILE" 2>&1; then
+        mv src/app/build/outputs/apk/debug/* out/ >> "$LOG_FILE" 2>&1
         echo "OK (Artifacts in 'out/')"
     else
         echo "Done (No new artifacts)"

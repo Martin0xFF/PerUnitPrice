@@ -1,2 +1,3 @@
 include ':app'
+project(':app').projectDir = file('src/app')
 rootProject.name = "PerUnitPrice"

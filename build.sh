@@ -6,6 +6,42 @@ CONTAINER_ENGINE="docker"
 
 # --- Functions ---
 
+run_with_spinner() {
+    local msg="$1"
+    shift
+    # Run command in background, redirecting output to the log
+    ( "$@" ) >> "$LOG_FILE" 2>&1 &
+    local pid=$!
+    local spin='-\|/'
+    local i=0
+
+    # Ensure cursor is shown when script exits or is killed
+    trap "tput cnorm; exit 1" INT TERM
+    tput civis # Hide cursor
+
+    while kill -0 $pid 2>/dev/null; do
+        i=$(( (i+1) % 4 ))
+        # Get the last non-empty line of the log for context
+        local last_line=$(tail -n 5 "$LOG_FILE" 2>/dev/null | grep -v '^$' | tail -n 1 | cut -c1-60 | tr -d '\r\n')
+        printf "\r%s [%c] %-60s" "$msg" "${spin:$i:1}" "$last_line"
+        sleep 0.1
+    done
+
+    wait $pid
+    local exit_code=$?
+    
+    tput cnorm # Show cursor
+    printf "\r%s" "$msg"
+    printf "\e[K" # Clear to end of line
+
+    if [ $exit_code -eq 0 ]; then
+        echo " OK"
+    else
+        echo " FAILED (Check $LOG_FILE)"
+        exit 1
+    fi
+}
+
 parse_arguments() {
     ARGS=()
     for arg in "$@"; do
@@ -49,54 +85,30 @@ handle_stop() {
 }
 
 build_image() {
-    echo -n "Building container image using $CONTAINER_ENGINE... "
-    if $CONTAINER_ENGINE build -t per-unit-price-builder -f infra/Dockerfile . >> "$LOG_FILE" 2>&1; then
-        echo "OK"
-    else
-        echo "FAILED (Check $LOG_FILE)"
-        exit 1
-    fi
+    run_with_spinner "Building container image using $CONTAINER_ENGINE" \
+        $CONTAINER_ENGINE build -t per-unit-price-builder -f infra/Dockerfile .
 }
 
 ensure_container_running() {
     if ! $CONTAINER_ENGINE ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
-        echo -n "Starting persistent build container... "
+        # Preparation step (removing old container) isn't shown with a spinner but logged
         $CONTAINER_ENGINE rm -f "$CONTAINER_NAME" >> "$LOG_FILE" 2>&1
-        if $CONTAINER_ENGINE run -d --name "$CONTAINER_NAME" -v $(pwd):/app:Z per-unit-price-builder tail -f /dev/null >> "$LOG_FILE" 2>&1; then
-            echo "OK"
-        else
-            echo "FAILED (Check $LOG_FILE)"
-            exit 1
-        fi
+        run_with_spinner "Starting persistent build container" \
+            $CONTAINER_ENGINE run -d --name "$CONTAINER_NAME" -v $(pwd):/app:Z per-unit-price-builder tail -f /dev/null
     fi
 }
 
 format_code() {
-    echo -n "Formatting Rust code... "
-    if $CONTAINER_ENGINE exec "$CONTAINER_NAME" bash -c "cd src/core_logic && cargo fmt" >> "$LOG_FILE" 2>&1; then
-        echo "OK"
-    else
-        echo "FAILED (Check $LOG_FILE)"
-        exit 1
-    fi
-
-    echo -n "Formatting Kotlin code... "
-    if $CONTAINER_ENGINE exec "$CONTAINER_NAME" bash -c "ktlint -F 'src/app/src/main/java/**/*.kt'" >> "$LOG_FILE" 2>&1; then
-        echo "OK"
-    else
-        echo "FAILED (Check $LOG_FILE)"
-        exit 1
-    fi
+    run_with_spinner "Formatting Rust code" \
+        $CONTAINER_ENGINE exec "$CONTAINER_NAME" bash -c "cd src/core_logic && cargo fmt"
+    
+    run_with_spinner "Formatting Kotlin code" \
+        $CONTAINER_ENGINE exec "$CONTAINER_NAME" bash -c "ktlint -F 'src/app/src/main/java/**/*.kt'"
 }
 
 execute_gradle() {
-    echo -n "Executing gradle $GRADLE_TASK... "
-    if $CONTAINER_ENGINE exec "$CONTAINER_NAME" gradle "$GRADLE_TASK" >> "$LOG_FILE" 2>&1; then
-        echo "OK"
-    else
-        echo "FAILED (Check $LOG_FILE)"
-        exit 1
-    fi
+    run_with_spinner "Executing gradle $GRADLE_TASK" \
+        $CONTAINER_ENGINE exec "$CONTAINER_NAME" gradle "$GRADLE_TASK"
 }
 
 move_artifacts() {

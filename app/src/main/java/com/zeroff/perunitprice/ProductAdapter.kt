@@ -50,7 +50,7 @@ class ProductAdapter(
 
     class InputViewHolder(
         itemView: View,
-        onAddProduct: (String, String, String) -> Unit
+        private val onAddProduct: (String, String, String) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
         private val editName: EditText = itemView.findViewById(R.id.editName)
         private val editPrice: EditText = itemView.findViewById(R.id.editPrice)
@@ -59,16 +59,29 @@ class ProductAdapter(
 
         init {
             btnAdd.setOnClickListener {
-                val name = editName.text.toString().ifEmpty { "Product" }
-                val price = editPrice.text.toString()
-                val quantity = editQuantity.text.toString()
-                if (price.isNotEmpty()) {
-                    onAddProduct(name, price, quantity)
-                    editName.text.clear()
-                    editPrice.text.clear()
-                    editQuantity.text.clear()
-                    editName.requestFocus()
+                tryAddProduct()
+            }
+
+            editQuantity.setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                    tryAddProduct()
+                    true
+                } else {
+                    false
                 }
+            }
+        }
+
+        private fun tryAddProduct() {
+            val name = editName.text.toString().ifEmpty { "Product" }
+            val price = editPrice.text.toString()
+            val quantity = editQuantity.text.toString()
+            if (price.isNotEmpty()) {
+                onAddProduct(name, price, quantity)
+                editName.text.clear()
+                editPrice.text.clear()
+                editQuantity.text.clear()
+                editName.requestFocus()
             }
         }
     }

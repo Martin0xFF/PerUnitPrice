@@ -1,4 +1,4 @@
-mod parser;
+mod product;
 
 use jni::JNIEnv;
 use jni::objects::{JClass, JString};
@@ -27,7 +27,7 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_addProduct(
     let price_input: String = env.get_string(&price_input).unwrap().into();
     let quantity_input: String = env.get_string(&quantity_input).unwrap().into();
 
-    parser::add_product(name, price_input, quantity_input);
+    product::add_product(name, price_input, quantity_input);
 }
 
 #[no_mangle]
@@ -35,7 +35,7 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_clearProducts(
     _env: JNIEnv,
     _class: JClass,
 ) {
-    parser::clear_products();
+    product::clear_products();
 }
 
 #[no_mangle]
@@ -43,7 +43,7 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getProductCount
     _env: JNIEnv,
     _class: JClass,
 ) -> jint {
-    parser::get_product_count() as jint
+    product::get_product_count() as jint
 }
 
 #[no_mangle]
@@ -52,14 +52,14 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getProductAt(
     _class: JClass,
     index: jint,
 ) -> jstring {
-    if let Some(product) = parser::get_product_at(index as usize) {
+    if let Some(p) = product::get_product_at(index as usize) {
         // Return a semicolon-separated string for simplicity
         let result = format!("{};{};{};{};{}", 
-            product.name, 
-            product.price_input, 
-            product.quantity_input, 
-            product.formatted_result, 
-            product.raw_per_unit_price
+            p.name, 
+            p.price_input, 
+            p.quantity_input, 
+            p.formatted_result, 
+            p.raw_per_unit_price
         );
         let output = env.new_string(result).expect("Couldn't create java string!");
         output.into_raw()
@@ -83,9 +83,9 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculatePerUni
 
     debug!("calculatePerUnitPrice called with price: {}, quantity_str: '{}'", price, input);
 
-    let result = match parser::parse_input(&input) {
+    let result = match product::parse_input(&input) {
         Some(parsed) => {
-            let per_unit = parser::calculate_per_unit_price(price, parsed.quantity);
+            let per_unit = product::calculate_per_unit_price(price, parsed.quantity);
             let unit_name = if parsed.unit.is_empty() { "unit" } else { &parsed.unit };
             let formatted = format!("{:.2} / {}", per_unit, unit_name);
             info!("Successfully parsed input. Per unit price: {}", formatted);
@@ -113,9 +113,9 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculateRawPer
         .expect("Couldn't get java string!")
         .into();
 
-    match parser::parse_input(&input) {
+    match product::parse_input(&input) {
         Some(parsed) => {
-            parser::calculate_per_unit_price(price, parsed.quantity)
+            product::calculate_per_unit_price(price, parsed.quantity)
         }
         None => {
             f64::MAX // Return a high value to sort invalid ones to the bottom
@@ -134,7 +134,7 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getUnit(
         .expect("Couldn't get java string!")
         .into();
 
-    let unit = parser::get_unit_str(&input);
+    let unit = product::get_unit_str(&input);
     let output = env.new_string(unit).expect("Couldn't create java string!");
     output.into_raw()
 }

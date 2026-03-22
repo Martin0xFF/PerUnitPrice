@@ -3,8 +3,6 @@ package com.zeroff.perunitprice
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,46 +28,37 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "Activity created")
 
-        val editPrice = findViewById<EditText>(R.id.editPrice)
-        val editQuantity = findViewById<EditText>(R.id.editQuantity)
-        val btnAddItem = findViewById<Button>(R.id.btnAddItem)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
-        productAdapter = ProductAdapter()
+        productAdapter = ProductAdapter { name, priceStr, quantityStr ->
+            addItem(name, priceStr, quantityStr)
+        }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = productAdapter
+    }
 
-        btnAddItem.setOnClickListener {
-            val priceStr = editPrice.text.toString()
-            val quantityStr = editQuantity.text.toString()
+    private fun addItem(name: String, priceStr: String, quantityStr: String) {
+        Log.d(TAG, "Add Item triggered: name=$name, price=$priceStr, quantity=$quantityStr")
 
-            Log.d(TAG, "Add Item clicked: price=$priceStr, quantity=$quantityStr")
-
-            val price = priceStr.toDoubleOrNull()
-            if (price == null || price <= 0.0) {
-                Log.w(TAG, "Invalid price input: $priceStr")
-                Toast.makeText(this, "Please enter a valid price.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Call the native Rust functions
-            val formattedResult = calculatePerUnitPrice(price, quantityStr)
-            val rawPrice = calculateRawPerUnitPrice(price, quantityStr)
-            
-            Log.d(TAG, "Native calculation result: $formattedResult (Raw: $rawPrice)")
-            
-            val newProduct = Product(priceStr, quantityStr, formattedResult, rawPrice)
-            productList.add(newProduct)
-            
-            // Sort list by raw price ascending
-            productList.sortBy { it.rawPerUnitPrice }
-            
-            productAdapter.submitList(productList.toList())
-
-            // Clear inputs for the next item
-            editPrice.text.clear()
-            editQuantity.text.clear()
-            editPrice.requestFocus()
+        val price = priceStr.toDoubleOrNull()
+        if (price == null || price <= 0.0) {
+            Log.w(TAG, "Invalid price input: $priceStr")
+            Toast.makeText(this, "Please enter a valid price.", Toast.LENGTH_SHORT).show()
+            return
         }
+
+        // Call the native Rust functions
+        val formattedResult = calculatePerUnitPrice(price, quantityStr)
+        val rawPrice = calculateRawPerUnitPrice(price, quantityStr)
+        
+        Log.d(TAG, "Native calculation result: $formattedResult (Raw: $rawPrice)")
+        
+        val newProduct = Product(name, priceStr, quantityStr, formattedResult, rawPrice)
+        productList.add(newProduct)
+        
+        // Sort list by raw price ascending
+        productList.sortBy { it.rawPerUnitPrice }
+        
+        productAdapter.submitList(productList.toList())
     }
 }

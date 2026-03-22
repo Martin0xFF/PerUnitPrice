@@ -23,6 +23,14 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/textName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <TextView
             android:id="@+id/textInputs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

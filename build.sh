@@ -26,11 +26,12 @@ initialize_log() {
 infrastructure_check() {
     echo "Infrastructure check..."
     if [ "$CONTAINER_ENGINE" == "podman" ]; then
-        REQUIRED_MEM=$((8 * 1024 * 1024 * 1024))
+        # Check if podman has enough memory (6GB = 6 * 1024 * 1024 * 1024 bytes)
+        REQUIRED_MEM=$((6 * 1024 * 1024 * 1024))
         TOTAL_MEM=$(podman info --format '{{.Host.MemTotal}}' 2>/dev/null || echo 0)
 
         if [ "$TOTAL_MEM" -lt "$REQUIRED_MEM" ]; then
-            echo "INFRA error: podman machine doesn't have enough ram (Found: $((TOTAL_MEM / 1024 / 1024 / 1024))GB, Required: 8GB)"
+            echo "INFRA error: podman machine doesn't have enough ram (Found: $((TOTAL_MEM / 1024 / 1024 / 1024))GB, Required: 6GB)"
             exit 1
         fi
         echo "Podman memory check: OK"

@@ -10,9 +10,9 @@ An Android application for calculating per-unit prices, featuring a high-perform
 
 ## Prerequisites
 - **Docker** (recommended) or **Podman** installed and running.
-- **Resources:** If using Podman, the machine **must have at least 8GB of RAM** allocated.
+- **Resources:** If using Podman, the machine **must have at least 6GB of RAM** allocated.
   ```bash
-  podman machine set --memory 8192
+  podman machine set --memory 6144
   ```
 
 ## Development Flow

@@ -10,7 +10,7 @@ run_test() {
     
     # Extract the logic and mock TOTAL_MEM
     local script_to_run="
-REQUIRED_MEM=\$((8 * 1024 * 1024 * 1024))
+REQUIRED_MEM=\$((6 * 1024 * 1024 * 1024))
 TOTAL_MEM=$mock_mem
 
 if [ \"\$TOTAL_MEM\" -lt \"\$REQUIRED_MEM\" ]; then
@@ -31,11 +31,11 @@ exit 0
     fi
 }
 
-# Test 1: Fail if less than 8GB (e.g., 4GB)
+# Test 1: Fail if less than 6GB (e.g., 4GB)
 run_test "Fail on 4GB" $((4 * 1024 * 1024 * 1024)) 1
 
-# Test 2: Pass if exactly 8GB
-run_test "Pass on 8GB" $((8 * 1024 * 1024 * 1024)) 0
+# Test 2: Pass if exactly 6GB
+run_test "Pass on 6GB" $((6 * 1024 * 1024 * 1024)) 0
 
-# Test 3: Pass if more than 8GB (e.g., 16GB)
+# Test 3: Pass if more than 6GB (e.g., 16GB)
 run_test "Pass on 16GB" $((16 * 1024 * 1024 * 1024)) 0

@@ -112,15 +112,28 @@ execute_gradle() {
 copy_artifacts() {
     echo -n "Copying artifacts... "
     mkdir -p out
+    local copied=false
+
+    # Copy Debug APKs
     if [ -d "src/app/build/outputs/apk/debug" ]; then
-        if ls src/app/build/outputs/apk/debug/* >> "$LOG_FILE" 2>&1; then
-            cp src/app/build/outputs/apk/debug/* out/ >> "$LOG_FILE" 2>&1
-            echo "OK (Artifacts in 'out/')"
-        else
-            echo "Done (No new artifacts)"
+        if ls src/app/build/outputs/apk/debug/*.apk >> "$LOG_FILE" 2>&1; then
+            cp src/app/build/outputs/apk/debug/*.apk out/ >> "$LOG_FILE" 2>&1
+            copied=true
         fi
+    fi
+
+    # Copy Release APKs
+    if [ -d "src/app/build/outputs/apk/release" ]; then
+        if ls src/app/build/outputs/apk/release/*.apk >> "$LOG_FILE" 2>&1; then
+            cp src/app/build/outputs/apk/release/*.apk out/ >> "$LOG_FILE" 2>&1
+            copied=true
+        fi
+    fi
+
+    if [ "$copied" = true ]; then
+        echo "OK (Artifacts in 'out/')"
     else
-        echo "Done"
+        echo "Done (No new artifacts)"
     fi
 }
 

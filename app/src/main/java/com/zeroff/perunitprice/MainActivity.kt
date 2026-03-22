@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "[PUP][UI]"
     private val productList = mutableListOf<Product>()
     private lateinit var productAdapter: ProductAdapter
+    private var firstUnit: String? = null
 
     // Load the native library
     init {
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     // Declare the native functions
     private external fun calculatePerUnitPrice(price: Double, quantityStr: String): String
     private external fun calculateRawPerUnitPrice(price: Double, quantityStr: String): Double
+    private external fun getUnit(quantityStr: String): String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Reset All clicked")
             productList.clear()
             productAdapter.submitList(emptyList())
+            firstUnit = null
             Toast.makeText(this, "All items cleared", Toast.LENGTH_SHORT).show()
         }
     }
@@ -56,14 +59,26 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        val currentUnit = getUnit(quantityStr)
+        val effectiveQuantityStr = if (currentUnit.isEmpty() && firstUnit != null) {
+            if (quantityStr.isBlank()) "1$firstUnit" else "$quantityStr$firstUnit"
+        } else {
+            quantityStr
+        }
+
         // Call the native Rust functions
-        val formattedResult = calculatePerUnitPrice(price, quantityStr)
-        val rawPrice = calculateRawPerUnitPrice(price, quantityStr)
+        val formattedResult = calculatePerUnitPrice(price, effectiveQuantityStr)
+        val rawPrice = calculateRawPerUnitPrice(price, effectiveQuantityStr)
         
         Log.d(TAG, "Native calculation result: $formattedResult (Raw: $rawPrice)")
         
-        val newProduct = Product(name, priceStr, quantityStr, formattedResult, rawPrice)
+        val newProduct = Product(name, priceStr, effectiveQuantityStr, formattedResult, rawPrice)
         productList.add(newProduct)
+        
+        if (firstUnit == null && currentUnit.isNotEmpty()) {
+            firstUnit = currentUnit
+            Log.d(TAG, "First unit set: $firstUnit")
+        }
         
         // Sort list by raw price ascending
         productList.sortBy { it.rawPerUnitPrice }

@@ -72,3 +72,19 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_calculateRawPer
         }
     }
 }
+
+#[no_mangle]
+pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getUnit(
+    mut env: JNIEnv,
+    _class: JClass,
+    quantity_str: JString,
+) -> jstring {
+    let input: String = env
+        .get_string(&quantity_str)
+        .expect("Couldn't get java string!")
+        .into();
+
+    let unit = parser::get_unit_str(&input);
+    let output = env.new_string(unit).expect("Couldn't create java string!");
+    output.into_raw()
+}

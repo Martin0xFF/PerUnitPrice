@@ -49,6 +49,16 @@ pub fn parse_input(input: &str) -> Option<ParsedInput> {
     Some(ParsedInput { quantity: normalized_quantity, unit })
 }
 
+pub fn get_unit_str(input: &str) -> String {
+    let input = input.trim().to_lowercase();
+    let re = Regex::new(r"^[\d\.]+\s*([a-z]*)$").unwrap();
+    if let Some(caps) = re.captures(&input) {
+        caps.get(1).map_or("", |m| m.as_str()).to_string()
+    } else {
+        "".to_string()
+    }
+}
+
 pub fn calculate_per_unit_price(price: f64, quantity: f64) -> f64 {
     if quantity <= 0.0 {
         warn!("Quantity is <= 0: {}", quantity);
@@ -88,5 +98,13 @@ mod tests {
     #[test]
     fn test_calculate_price() {
         assert_eq!(calculate_per_unit_price(10.0, 2.0), 5.0);
+    }
+
+    #[test]
+    fn test_get_unit_str() {
+        assert_eq!(get_unit_str("1.5 kg"), "kg");
+        assert_eq!(get_unit_str("500g"), "g");
+        assert_eq!(get_unit_str("10"), "");
+        assert_eq!(get_unit_str("  2.0  Litres  "), "litres");
     }
 }

@@ -49,7 +49,7 @@ pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getProductCount
 
 #[no_mangle]
 pub extern "system" fn Java_com_zeroff_perunitprice_MainActivity_getProductAt(
-    mut env: JNIEnv,
+    env: JNIEnv,
     _class: JClass,
     index: jint,
 ) -> jstring {

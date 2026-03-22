@@ -43,3 +43,4 @@ desktop.ini
 
 # JNI Libs (built by Rust)
 app/src/main/jniLibs/
+build.log

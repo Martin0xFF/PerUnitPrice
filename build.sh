@@ -12,7 +12,7 @@ run_with_spinner() {
     # Run command in background, redirecting output to the log
     ( "$@" ) >> "$LOG_FILE" 2>&1 &
     local pid=$!
-    local spin='-\|/'
+    local spin=('.  ' '.. ' '...')
     local i=0
 
     # Ensure cursor is shown when script exits or is killed
@@ -20,11 +20,11 @@ run_with_spinner() {
     tput civis # Hide cursor
 
     while kill -0 $pid 2>/dev/null; do
-        i=$(( (i+1) % 4 ))
+        i=$(( (i+1) % 3 ))
         # Get the last non-empty line of the log for context
         local last_line=$(tail -n 5 "$LOG_FILE" 2>/dev/null | grep -v '^$' | tail -n 1 | cut -c1-60 | tr -d '\r\n')
-        printf "\r%s [%c] %-60s" "$msg" "${spin:$i:1}" "$last_line"
-        sleep 0.1
+        printf "\r%s %s %-60s" "$msg" "${spin[$i]}" "$last_line"
+        sleep 0.2
     done
 
     wait $pid

@@ -5,14 +5,19 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "[PUP][UI]"
     private lateinit var productAdapter: ProductAdapter
     private var firstUnit: String? = null
+    
+    private val PREFS_NAME = "pup_prefs"
+    private val KEY_DARK_MODE = "dark_mode"
 
     // Load the native library
     init {
@@ -31,6 +36,16 @@ class MainActivity : AppCompatActivity() {
     private external fun getProductAt(index: Int): String
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val isDarkMode = prefs.getBoolean(KEY_DARK_MODE, false)
+        
+        // Apply theme before super.onCreate and setContentView
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -38,6 +53,21 @@ class MainActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val btnReset = findViewById<Button>(R.id.btnReset)
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+
+        // Set navigation icon based on current mode
+        toolbar.setNavigationIcon(if (isDarkMode) R.drawable.ic_sun else R.drawable.ic_moon)
+
+        toolbar.setNavigationOnClickListener {
+            val newMode = !prefs.getBoolean(KEY_DARK_MODE, false)
+            prefs.edit().putBoolean(KEY_DARK_MODE, newMode).apply()
+            
+            if (newMode) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
 
         productAdapter = ProductAdapter { name, priceStr, quantityStr ->
             addItem(name, priceStr, quantityStr)

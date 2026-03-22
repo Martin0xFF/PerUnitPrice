@@ -18,7 +18,9 @@
             android:layout_height="?attr/actionBarSize"
             app:title="@string/app_name"
             app:titleCentered="true"
-            app:titleTextColor="?attr/colorOnSurface">
+            app:titleTextColor="?attr/colorOnSurface"
+            app:navigationIcon="@drawable/ic_moon"
+            app:navigationIconTint="?attr/colorSecondary">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReset"

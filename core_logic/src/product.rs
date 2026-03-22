@@ -46,7 +46,7 @@ pub fn add_product(name: String, price_input: String, quantity_input: String) {
         Some(parsed) => {
             let per_unit = calculate_per_unit_price(price, parsed.quantity);
             let unit_name = if parsed.unit.is_empty() { "unit" } else { &parsed.unit };
-            (format!("{:.2} / {}", per_unit, unit_name), per_unit)
+            (format!("${:.2} / {}", per_unit, unit_name), per_unit)
         }
         None => ("Invalid input".to_string(), f64::MAX)
     };

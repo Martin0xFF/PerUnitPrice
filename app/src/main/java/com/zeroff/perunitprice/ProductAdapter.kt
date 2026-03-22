@@ -96,7 +96,7 @@ class ProductAdapter(
             val rank = position + 1
             textRank.text = "#$rank"
             textName.text = product.name
-            textInputs.text = "Price: ${product.priceInput}, Qty: ${product.quantityInput}"
+            textInputs.text = "Price: $${product.priceInput}, Qty: ${product.quantityInput}"
             textResult.text = product.formattedResult
         }
     }
